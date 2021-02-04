@@ -1,10 +1,6 @@
-# run using:
-#   ansible-playbook rayyan-dev-playbook.yaml
-# to install required collections:
-#   ansible-galaxy collection install community.general community.kubernetes
 ---
 - name: docker installer
-  hosts: awsdev
+  hosts: k8sdev
   become: true
   tasks:
   - name: install deps
@@ -55,7 +51,7 @@
       state: restarted
 
 - name: microk8s installer
-  hosts: awsdev
+  hosts: k8sdev
   become: yes
   tasks:
   - name: snap installer
@@ -84,18 +80,18 @@
       group: "{{ ansible_user }}"
 
 - name: kubectl installer
-  hosts: awsdev
+  hosts: k8sdev
   become: yes
   tasks:
   - name: snap installer
     community.general.snap:
       name: kubectl
       classic: yes
-  - name: enalbe bash completion
+  - name: enable bash completion
     shell: 'kubectl completion bash >/etc/bash_completion.d/kubectl'
 
 - name: sops installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: download sops
     get_url: 
@@ -112,14 +108,14 @@
       group: "{{ ansible_user }}"
 
 - name: helm and helm plugins installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: snap installer
     become: yes
     community.general.snap:
       name: helm
       classic: yes
-  - name: enalbe bash completion
+  - name: enable bash completion
     become: yes
     shell: 'helm completion bash >/etc/bash_completion.d/helm'
   - name: install helm-secrets plugin
@@ -129,7 +125,7 @@
       namespace: kube-system
    
 - name: skaffold installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: download skaffold
     get_url: 
@@ -144,12 +140,12 @@
       mode: u+x
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
-  - name: enalbe bash completion
+  - name: enable bash completion
     become: yes
     shell: 'skaffold completion bash >/etc/bash_completion.d/skaffold'
 
 - name: k9s installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: download k9s
     become: yes
@@ -165,7 +161,7 @@
       group: "{{ ansible_user }}"
 
 - name: azure-cli installer
-  hosts: awsdev
+  hosts: k8sdev
   become: true
   tasks:
   - name: install deps
@@ -194,7 +190,7 @@
       update_cache: yes
 
 - name: ingress installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: add ingress-nginx repo
     community.kubernetes.helm_repository:
@@ -214,7 +210,7 @@
               https: 30443
 
 - name: kube-ps1 installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: git checkout
     git:
@@ -228,7 +224,7 @@
         source $HOME/.kube-ps1/kube-ps1.sh && PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
 
 - name: kubectx and kubens installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: git checkout
     git:
@@ -268,7 +264,7 @@
       state: link
 
 - name: tmux installer
-  hosts: awsdev
+  hosts: k8sdev
   tasks:
   - name: install tmux
     become: yes
