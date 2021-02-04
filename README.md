@@ -1,5 +1,5 @@
-# Oh My Kubernetes
-An Ansible Playbook to automate the configuration of (Ubuntu Linux) machines
+# Oh My Kubernetes!
+An Ansible Playbook to automate the configuration of (Ubuntu Linux x86_64) machines
 to be ready for Kubernetes development. It cuts down the development
 environment preparation from tedious hours to less than 5 minutes.
 
@@ -48,14 +48,22 @@ containing all the machines you want to configure (yes you can configure many ma
 To launch the installation process that will configure all target
 machines at once, run the following:
 ```bash
+git clone https://github.com/hammady/ohmyk8s.git
+cd ohmyk8s
 ansible-playbook ohmyk8s.yaml
 ```
-Sit and watch for the results, you should get a report similar to the below if everything goes well:
+Sit (or stand!) and watch the results, you should get a report similar to the below if everything goes well:
 ```
 ...
 PLAY RECAP *******************************
 awsdev1                     : ok=56   changed=7    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
 ```
+
+## Caveats
+- This only supports Ubuntu 20.04 running on x86_64 architectures.
+Support for other distributions and architectures is possible but needs some work.
+For example, the `focal` distro is hard-coded in some lines and should be detected.
+
 ## Support
 If there are any errors from the above command, please create an issue in this repo or drop
 me a line at: github at hammady dot net.
