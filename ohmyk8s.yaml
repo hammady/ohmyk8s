@@ -143,6 +143,12 @@
   - name: enable bash completion
     become: yes
     shell: 'skaffold completion bash >/etc/bash_completion.d/skaffold'
+  - name: set skaffold global environment variables
+    lineinfile:
+      path: .bashrc
+      regexp: 'export SKAFFOLD_.*'
+      line: |
+        export SKAFFOLD_INSECURE_REGISTRY=localhost:32000 && export SKAFFOLD_DEFAULT_REPO=localhost:32000
 
 - name: k9s installer
   hosts: k8sdev
