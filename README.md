@@ -48,9 +48,11 @@ containing all the machines you want to configure (yes you can configure many ma
 To launch the installation process that will configure all target
 machines at once, run the following:
 ```bash
+git clone https://github.com/hammady/ohmyk8s.git
+cd ohmyk8s
 ansible-playbook ohmyk8s.yaml
 ```
-Sit and watch for the results, you should get a report similar to the below if everything goes well:
+Sit (or stand!) and watch the results, you should get a report similar to the below if everything goes well:
 ```
 ...
 PLAY RECAP *******************************
