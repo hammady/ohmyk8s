@@ -1,0 +1,292 @@
+# run using:
+#   ansible-playbook rayyan-dev-playbook.yaml
+# to install required collections:
+#   ansible-galaxy collection install community.general community.kubernetes
+---
+- name: docker installer
+  hosts: awsdev
+  become: true
+  tasks:
+  - name: install deps
+    apt:
+      name: "{{item}}"
+      state: present
+      update_cache: yes
+    loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+  - name: add official GPG key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+  - name: add apt repository for docker
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu focal stable # TODO parameterize: lsb_release -cs
+      state: present
+  - name: install docker
+    apt:
+      name: "{{item}}"
+      state: latest
+      update_cache: yes
+    loop:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+  - name: ensure docker service is running
+    service:
+      name: docker
+      state: started
+      enabled: yes
+  - name: add ansible user to docker group
+    user:
+      name: "{{ ansible_user }}"
+      groups: docker
+      append: yes
+  - name: allow insecure registries
+    copy:
+      content: '{"insecure-registries" : ["localhost:32000"]}'
+      dest: /etc/docker/daemon.json
+  - name: restart docker
+    service:
+      name: docker
+      state: restarted
+
+- name: microk8s installer
+  hosts: awsdev
+  become: yes
+  tasks:
+  - name: snap installer
+    community.general.snap:
+      name: microk8s
+      classic: yes
+  - name: pauser
+    shell: 'microk8s status --wait-ready'
+  - name: addons enabler
+    shell: 'microk8s enable dns ingress storage registry metrics-server'
+  - name: ensure .kube dir exists
+    file:
+      path: .kube
+      state: directory
+      mode: 0700
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+  - name: export kube config
+    become: yes
+    shell: 'microk8s.kubectl config view --raw > .kube/config'
+  - name: ensure .kube/config has correct permissions
+    file:
+      path: .kube/config
+      mode: 0600
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+
+- name: kubectl installer
+  hosts: awsdev
+  become: yes
+  tasks:
+  - name: snap installer
+    community.general.snap:
+      name: kubectl
+      classic: yes
+  - name: enalbe bash completion
+    shell: 'kubectl completion bash >/etc/bash_completion.d/kubectl'
+
+- name: sops installer
+  hosts: awsdev
+  tasks:
+  - name: download sops
+    get_url: 
+      url: https://github.com/mozilla/sops/releases/download/v3.6.1/sops-v3.6.1.linux
+      dest: /tmp/sops
+  - name: copy to $PATH
+    become: yes
+    copy:
+      src: /tmp/sops
+      remote_src: yes
+      dest: /usr/local/bin/
+      mode: u+x
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+
+- name: helm and helm plugins installer
+  hosts: awsdev
+  tasks:
+  - name: snap installer
+    become: yes
+    community.general.snap:
+      name: helm
+      classic: yes
+  - name: enalbe bash completion
+    become: yes
+    shell: 'helm completion bash >/etc/bash_completion.d/helm'
+  - name: install helm-secrets plugin
+    community.kubernetes.helm_plugin:
+      plugin_path: https://github.com/zendesk/helm-secrets
+      state: present
+      namespace: kube-system
+   
+- name: skaffold installer
+  hosts: awsdev
+  tasks:
+  - name: download skaffold
+    get_url: 
+      url: https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+      dest: /tmp/skaffold
+  - name: copy to $PATH
+    become: yes
+    copy:
+      src: /tmp/skaffold
+      remote_src: yes
+      dest: /usr/local/bin/
+      mode: u+x
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+  - name: enalbe bash completion
+    become: yes
+    shell: 'skaffold completion bash >/etc/bash_completion.d/skaffold'
+
+- name: k9s installer
+  hosts: awsdev
+  tasks:
+  - name: download k9s
+    become: yes
+    unarchive:
+      src: https://github.com/derailed/k9s/releases/download/v0.24.2/k9s_Linux_x86_64.tar.gz
+      remote_src: yes
+      dest: /usr/local/bin/
+      extra_opts:
+        - "--add-file"
+        - "k9s"
+      mode: u+x
+      owner: "{{ ansible_user }}"
+      group: "{{ ansible_user }}"
+
+- name: azure-cli installer
+  hosts: awsdev
+  become: true
+  tasks:
+  - name: install deps
+    apt:
+      name: "{{item}}"
+      state: present
+      update_cache: yes
+    loop:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - gnupg-agent
+    - software-properties-common
+  - name: add official GPG key
+    apt_key:
+      url: https://packages.microsoft.com/keys/microsoft.asc
+      state: present
+  - name: add apt repository for azure-cli
+    apt_repository:
+      repo: deb https://packages.microsoft.com/repos/azure-cli/ focal main # TODO parameterize: lsb_release -cs
+      state: present
+  - name: install azure-cli
+    apt:
+      name: azure-cli
+      state: latest
+      update_cache: yes
+
+- name: ingress installer
+  hosts: awsdev
+  tasks:
+  - name: add ingress-nginx repo
+    community.kubernetes.helm_repository:
+      name: ingress-nginx
+      repo_url: "https://kubernetes.github.io/ingress-nginx"
+  - name: deploy ingress-nginx chart 
+    community.kubernetes.helm:
+      name: ingress-nginx
+      chart_ref: ingress-nginx/ingress-nginx
+      release_namespace: kube-system
+      values:
+        controller:
+          service:
+            type: NodePort
+            nodePorts:
+              http: 30080
+              https: 30443
+
+- name: kube-ps1 installer
+  hosts: awsdev
+  tasks:
+  - name: git checkout
+    git:
+      repo: https://github.com/jonmosco/kube-ps1.git
+      dest: .kube-ps1
+  - name: update .bashrc
+    lineinfile:
+      path: .bashrc
+      regexp: 'source \$HOME/\.kube-ps1.*'
+      line: |
+        source $HOME/.kube-ps1/kube-ps1.sh && PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
+
+- name: kubectx and kubens installer
+  hosts: awsdev
+  tasks:
+  - name: git checkout
+    git:
+      repo: https://github.com/ahmetb/kubectx.git
+      dest: .kubectx
+  - name: make kubectx script executable
+    file:
+      path: .kubectx/kubectx
+      mode: u+x
+  - name: make kubens script executable
+    file:
+      path: .kubectx/kubens
+      mode: u+x
+  - name: create kctx symbolic link
+    become: yes
+    file:
+      src: /home/{{ ansible_user }}/.kubectx/kubectx
+      dest: /usr/local/bin/kctx
+      state: link
+  - name: create kns symbolic link
+    become: yes
+    file:
+      src: /home/{{ ansible_user }}/.kubectx/kubens
+      dest: /usr/local/bin/kns
+      state: link
+  - name: enable auto-completion for kctx
+    become: yes
+    file:
+      src: /home/{{ ansible_user }}/.kubectx/completion/kubectx.bash
+      dest: /etc/bash_completion.d/kctx
+      state: link
+  - name: enable auto-completion for kns
+    become: yes
+    file:
+      src: /home/{{ ansible_user }}/.kubectx/completion/kubens.bash
+      dest: /etc/bash_completion.d/kns
+      state: link
+
+- name: tmux installer
+  hosts: awsdev
+  tasks:
+  - name: install tmux
+    become: yes
+    apt:
+      name: tmux
+      state: present
+      update_cache: yes
+  - name: git checkout ohmytmux
+    git:
+      repo: https://github.com/gpakosz/.tmux.git
+      dest: .tmux
+  - name: link configuration file in user home
+    file:
+      src: /home/{{ ansible_user }}/.tmux/.tmux.conf
+      dest: /home/{{ ansible_user }}/.tmux.conf
+      state: link
+  - name: copy local configuration file to user home
+    copy:
+      src: /home/{{ ansible_user }}/.tmux/.tmux.conf.local
+      remote_src: yes
+      dest: /home/{{ ansible_user }}/
