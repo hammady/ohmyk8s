@@ -61,7 +61,7 @@
   - name: pauser
     shell: 'microk8s status --wait-ready'
   - name: addons enabler
-    shell: 'microk8s enable dns ingress storage registry metrics-server'
+    shell: 'microk8s enable dns storage registry metrics-server'
   - name: ensure .kube dir exists
     file:
       path: .kube
