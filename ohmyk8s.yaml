@@ -120,9 +120,9 @@
     shell: 'helm completion bash >/etc/bash_completion.d/helm'
   - name: install helm-secrets plugin
     community.kubernetes.helm_plugin:
-      plugin_path: https://github.com/zendesk/helm-secrets
+      plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
-      namespace: kube-system
+
    
 - name: skaffold installer
   hosts: k8sdev
