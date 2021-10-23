@@ -44,6 +44,8 @@ containing all the machines you want to configure (yes you can configure many ma
     ...
     ```
 
+The above file can be stored in the default location `/etc/ansible/hosts` if the control machine is running Debian/Ubuntu or a similar distro. For other distros or other operating systems, you can store it in any location then supply `--inventory <file-location>` to the `ansible-playbook` command.
+
 ## Installation
 To launch the installation process that will configure all target
 machines at once, run the following:
