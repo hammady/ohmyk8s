@@ -156,7 +156,7 @@
   - name: download k9s
     become: yes
     unarchive:
-      src: https://github.com/derailed/k9s/releases/download/v0.24.2/k9s_Linux_x86_64.tar.gz
+      src: https://github.com/derailed/k9s/releases/download/v0.25.18/k9s_Linux_x86_64.tar.gz
       remote_src: yes
       dest: /usr/local/bin/
       extra_opts:
