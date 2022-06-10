@@ -4,21 +4,26 @@ to be ready for Kubernetes development. It cuts down the development
 environment preparation from tedious hours to less than 5 minutes.
 
 ## Included software
-- [Git](https://git-scm.com/)
-- [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
-- [Kubernetes (microk8s)](https://microk8s.io/)
+
+The below are installed on both `k8sdev` and `k8sdevlite` groups:
+
+- [git](https://git-scm.com/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
 - [helm](https://helm.sh/)
 - [skaffold](https://skaffold.dev/)
 - [k9s](https://github.com/derailed/k9s)
-- [SOPS](https://github.com/mozilla/sops) and [helm secrets plugin](https://github.com/zendesk/helm-secrets)
+- [sops](https://github.com/mozilla/sops) and [helm secrets plugin](https://github.com/zendesk/helm-secrets)
 - [azure-cli](https://docs.microsoft.com/en-us/cli/azure/)
-- [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)
 - [kube-ps1](https://github.com/jonmosco/kube-ps1)
 - [tmux](https://tmuxcheatsheet.com/) and [.tmux](https://github.com/gpakosz/.tmux)
 - [kubectx/kubens](https://github.com/ahmetb/kubectx)
 
 All of the above come with bash completion, whenever applicable.
+
+The below are installed only on the `k8sdev` group:
+- [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+- [Kubernetes (microk8s)](https://microk8s.io/)
+- [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)
 
 ## System requirements
 1. [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html?extIdCarryOver=true&sc_cid=701f2000001OH7YAAW) on your controller machine (e.g. laptop) which is typically different from, but could be the same as, the target machine you are preparing. You also need a couple of Ansible collections, install using the command:
@@ -33,7 +38,7 @@ All of the above come with bash completion, whenever applicable.
         IdentitiesOnly yes
     ```
 
-1. A configured Ansible hosts file with a section called `k8sdev`
+1. A configured Ansible hosts file with 2 sections called `k8sdev` and `k8sdevlite`
 containing all the machines you want to configure (yes you can configure many machines at once!). For example:
     ```ini
     # /etc/ansible/hosts
@@ -41,6 +46,8 @@ containing all the machines you want to configure (yes you can configure many ma
     awsdev1 ansible_ssh_user=ubuntu
     1.2.3.4
     5.6.7.8
+    ...
+    [k8sdevlite]
     ...
     ```
 

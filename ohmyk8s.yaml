@@ -1,6 +1,6 @@
 ---
-- name: docker installer
-  hosts: k8sdev
+- name: docker dependencies installer
+  hosts: k8sdev, k8sdevlite
   become: true
   tasks:
   - name: install deps
@@ -22,6 +22,11 @@
     apt_repository:
       repo: deb https://download.docker.com/linux/ubuntu focal stable # TODO parameterize: lsb_release -cs
       state: present
+
+- name: docker engine installer
+  hosts: k8sdev
+  become: true
+  tasks:
   - name: install docker
     apt:
       name: "{{item}}"
@@ -29,7 +34,7 @@
       update_cache: yes
     loop:
       - docker-ce
-      - docker-ce-cli
+      - docker-compose-plugin
       - containerd.io
   - name: ensure docker service is running
     service:
@@ -50,6 +55,16 @@
       name: docker
       state: restarted
 
+- name: docker client installer
+  hosts: k8sdev, k8sdevlite
+  become: true
+  tasks:
+  - name: install docker client
+    apt:
+      name: "docker-ce-cli"
+      state: latest
+      update_cache: yes
+      
 - name: microk8s installer
   hosts: k8sdev
   become: yes
@@ -80,7 +95,7 @@
       group: "{{ ansible_user }}"
 
 - name: kubectl installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   become: yes
   tasks:
   - name: snap installer
@@ -91,11 +106,11 @@
     shell: 'kubectl completion bash >/etc/bash_completion.d/kubectl'
 
 - name: sops installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: download sops
     get_url: 
-      url: https://github.com/mozilla/sops/releases/download/v3.6.1/sops-v3.6.1.linux
+      url: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
       dest: /tmp/sops
   - name: copy to $PATH
     become: yes
@@ -108,7 +123,7 @@
       group: "{{ ansible_user }}"
 
 - name: helm and helm plugins installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: snap installer
     become: yes
@@ -123,9 +138,8 @@
       plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
 
-   
 - name: skaffold installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: download skaffold
     get_url: 
@@ -143,15 +157,19 @@
   - name: enable bash completion
     become: yes
     shell: 'skaffold completion bash >/etc/bash_completion.d/skaffold'
+
+- name: Set default repo for skaffold to local microk8s
+  hosts: k8sdev
+  tasks:
   - name: set skaffold global environment variables
     lineinfile:
       path: .bashrc
       regexp: 'export SKAFFOLD_.*'
       line: |
-        export SKAFFOLD_INSECURE_REGISTRY=localhost:32000 && export SKAFFOLD_DEFAULT_REPO=localhost:32000
+        export SKAFFOLD_INSECURE_REGISTRY=localhost:32000 SKAFFOLD_DEFAULT_REPO=localhost:32000
 
 - name: k9s installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: download k9s
     become: yes
@@ -167,7 +185,7 @@
       group: "{{ ansible_user }}"
 
 - name: azure-cli installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   become: true
   tasks:
   - name: install deps
@@ -216,7 +234,7 @@
               https: 30443
 
 - name: kube-ps1 installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: git checkout
     git:
@@ -230,7 +248,7 @@
         source $HOME/.kube-ps1/kube-ps1.sh && PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
 
 - name: kubectx and kubens installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: git checkout
     git:
@@ -270,7 +288,7 @@
       state: link
 
 - name: tmux installer
-  hosts: k8sdev
+  hosts: k8sdev, k8sdevlite
   tasks:
   - name: install tmux
     become: yes
@@ -292,3 +310,12 @@
       src: /home/{{ ansible_user }}/.tmux/.tmux.conf.local
       remote_src: yes
       dest: /home/{{ ansible_user }}/
+
+- name: apt cleaner
+  hosts: k8sdev, k8sdevlite
+  tasks:
+  - name: Remove dependencies that are no longer required and useless packages from the cache
+    become: yes
+    apt:
+      autoremove: yes
+      autoclean: true
