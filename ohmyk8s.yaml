@@ -265,25 +265,25 @@
   - name: create kctx symbolic link
     become: yes
     file:
-      src: /home/{{ ansible_user }}/.kubectx/kubectx
+      src: "{{ ansible_env.HOME }}/.kubectx/kubectx"
       dest: /usr/local/bin/kctx
       state: link
   - name: create kns symbolic link
     become: yes
     file:
-      src: /home/{{ ansible_user }}/.kubectx/kubens
+      src: "{{ ansible_env.HOME }}/.kubectx/kubens"
       dest: /usr/local/bin/kns
       state: link
   - name: enable auto-completion for kctx
     become: yes
     file:
-      src: /home/{{ ansible_user }}/.kubectx/completion/kubectx.bash
+      src: "{{ ansible_env.HOME }}/.kubectx/completion/kubectx.bash"
       dest: /etc/bash_completion.d/kctx
       state: link
   - name: enable auto-completion for kns
     become: yes
     file:
-      src: /home/{{ ansible_user }}/.kubectx/completion/kubens.bash
+      src: "{{ ansible_env.HOME }}/.kubectx/completion/kubens.bash"
       dest: /etc/bash_completion.d/kns
       state: link
 
@@ -302,14 +302,14 @@
       dest: .tmux
   - name: link configuration file in user home
     file:
-      src: /home/{{ ansible_user }}/.tmux/.tmux.conf
-      dest: /home/{{ ansible_user }}/.tmux.conf
+      src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf"
+      dest: "{{ ansible_env.HOME }}/.tmux.conf"
       state: link
   - name: copy local configuration file to user home
     copy:
-      src: /home/{{ ansible_user }}/.tmux/.tmux.conf.local
+      src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf.local"
       remote_src: yes
-      dest: /home/{{ ansible_user }}/
+      dest: "{{ ansible_env.HOME }}/"
 
 - name: apt cleaner
   hosts: k8sdev, k8sdevlite
