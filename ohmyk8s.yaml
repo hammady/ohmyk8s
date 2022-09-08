@@ -118,7 +118,7 @@
       src: /tmp/sops
       remote_src: yes
       dest: /usr/local/bin/
-      mode: uo+x
+      mode: a+x
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
 
