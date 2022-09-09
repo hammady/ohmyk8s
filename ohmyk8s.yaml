@@ -118,7 +118,7 @@
       src: /tmp/sops
       remote_src: yes
       dest: /usr/local/bin/
-      mode: u+x
+      mode: a+x
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
 
@@ -151,7 +151,7 @@
       src: /tmp/skaffold
       remote_src: yes
       dest: /usr/local/bin/
-      mode: u+x
+      mode: a+x
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
   - name: enable bash completion
@@ -180,7 +180,7 @@
       extra_opts:
         - "--add-file"
         - "k9s"
-      mode: u+x
+      mode: a+x
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
 
@@ -257,11 +257,11 @@
   - name: make kubectx script executable
     file:
       path: .kubectx/kubectx
-      mode: u+x
+      mode: a+x
   - name: make kubens script executable
     file:
       path: .kubectx/kubens
-      mode: u+x
+      mode: a+x
   - name: create kctx symbolic link
     become: yes
     file:
