@@ -14,6 +14,7 @@ The below are installed on both `k8sdev` and `k8sdevlite` groups:
 - [k9s](https://github.com/derailed/k9s)
 - [sops](https://github.com/mozilla/sops) and [helm secrets plugin](https://github.com/zendesk/helm-secrets)
 - [azure-cli](https://docs.microsoft.com/en-us/cli/azure/)
+- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [kube-ps1](https://github.com/jonmosco/kube-ps1)
 - [tmux](https://tmuxcheatsheet.com/) and [.tmux](https://github.com/gpakosz/.tmux)
 - [kubectx/kubens](https://github.com/ahmetb/kubectx)
@@ -43,9 +44,9 @@ containing all the machines you want to configure (yes you can configure many ma
     ```ini
     # /etc/ansible/hosts
     [k8sdev]
-    awsdev1 ansible_ssh_user=ubuntu
-    1.2.3.4
-    5.6.7.8
+    awsdev1 ansible_user=ubuntu
+    1.2.3.4 ansible_user=anotheruser
+    5.6.7.8 ansible_user=ubuntu
     ...
     [k8sdevlite]
     ...
