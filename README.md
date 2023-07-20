@@ -14,7 +14,7 @@ The below are installed on both `k8sdev` and `k8sdevlite` groups:
 - [k9s](https://github.com/derailed/k9s)
 - [sops](https://github.com/mozilla/sops) and [helm secrets plugin](https://github.com/zendesk/helm-secrets)
 - [azure-cli](https://docs.microsoft.com/en-us/cli/azure/)
-- [aws-cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+- [awscli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [kube-ps1](https://github.com/jonmosco/kube-ps1)
 - [tmux](https://tmuxcheatsheet.com/) and [.tmux](https://github.com/gpakosz/.tmux)
 - [kubectx/kubens](https://github.com/ahmetb/kubectx)
