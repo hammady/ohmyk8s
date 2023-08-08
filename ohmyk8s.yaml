@@ -217,12 +217,10 @@
   hosts: k8sdev, k8sdevlite
   become: true
   tasks:
-  - name: install awscli
-    apt:
-      name: awscli
-      state: latest
-      update_cache: yes
-
+  - name: snap installer
+    community.general.snap:
+      name: aws-cli
+      classic: yes
 - name: ingress installer
   hosts: k8sdev
   tasks:
