@@ -13,7 +13,7 @@ The below are installed on both `k8sdev` and `k8sdevlite` groups:
 - [skaffold](https://skaffold.dev/)
 - [k9s](https://github.com/derailed/k9s)
 - [sops](https://github.com/mozilla/sops) and [helm secrets plugin](https://github.com/zendesk/helm-secrets)
-- [azure-cli](https://docs.microsoft.com/en-us/cli/azure/)
+- [azure-cli](https://docs.microsoft.com/en-us/cli/azure/) and [kubelogin](https://github.com/Azure/kubelogin)
 - [awscli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
 - [kube-ps1](https://github.com/jonmosco/kube-ps1)
 - [tmux](https://tmuxcheatsheet.com/) and [.tmux](https://github.com/gpakosz/.tmux)

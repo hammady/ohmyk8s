@@ -213,6 +213,13 @@
       state: latest
       update_cache: yes
 
+- name: kubelogin installer
+  hosts: k8sdev, k8sdevlite
+  become: true
+  tasks:
+  - name: install kubectl (again) and kubelogin using azure-cli
+    shell: 'az aks install-cli'
+
 - name: awscli installer
   hosts: k8sdev, k8sdevlite
   become: true
