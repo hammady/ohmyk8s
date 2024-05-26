@@ -14,13 +14,17 @@
     - curl
     - gnupg-agent
     - software-properties-common
+    - lsb-release
+  - name: Get the distribution codename
+    command: lsb_release -sc
+    register: lsb_codename
   - name: add official GPG key
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
   - name: add apt repository for docker
     apt_repository:
-      repo: deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable 
+      repo: "deb https://download.docker.com/linux/ubuntu {{ lsb_codename.stdout }} stable"
       state: present
 
 - name: docker engine installer
@@ -199,13 +203,17 @@
     - curl
     - gnupg-agent
     - software-properties-common
+    - lsb-release
+  - name: Get the distribution codename
+    command: lsb_release -sc
+    register: lsb_codename
   - name: add official GPG key
     apt_key:
       url: https://packages.microsoft.com/keys/microsoft.asc
       state: present
   - name: add apt repository for azure-cli
     apt_repository:
-      repo: deb https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main 
+      repo: "deb https://packages.microsoft.com/repos/azure-cli/ {{ lsb_codename.stdout }} main"
       state: present
   - name: install azure-cli
     apt:
