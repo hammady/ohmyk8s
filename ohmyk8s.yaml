@@ -20,7 +20,7 @@
       state: present
   - name: add apt repository for docker
     apt_repository:
-      repo: deb https://download.docker.com/linux/ubuntu focal stable # TODO parameterize: lsb_release -cs
+      repo: deb https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable 
       state: present
 
 - name: docker engine installer
@@ -205,7 +205,7 @@
       state: present
   - name: add apt repository for azure-cli
     apt_repository:
-      repo: deb https://packages.microsoft.com/repos/azure-cli/ focal main # TODO parameterize: lsb_release -cs
+      repo: deb https://packages.microsoft.com/repos/azure-cli/ $(lsb_release -cs) main 
       state: present
   - name: install azure-cli
     apt:
