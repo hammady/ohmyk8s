@@ -83,7 +83,7 @@
     shell: 'microk8s enable dns storage registry metrics-server'
   - name: ensure .kube dir exists
     file:
-      path: .kube
+      path: "{{ ansible_env.HOME }}/.kube"
       state: directory
       mode: 0700
       owner: "{{ ansible_user }}"
@@ -93,7 +93,7 @@
     shell: 'microk8s.kubectl config view --raw > .kube/config'
   - name: ensure .kube/config has correct permissions
     file:
-      path: .kube/config
+      path: "{{ ansible_env.HOME }}/.kube/config"
       mode: 0600
       owner: "{{ ansible_user }}"
       group: "{{ ansible_user }}"
@@ -167,7 +167,7 @@
   tasks:
   - name: set skaffold global environment variables
     lineinfile:
-      path: .bashrc
+      path: "{{ ansible_env.HOME }}/.bashrc"
       regexp: 'export SKAFFOLD_.*'
       line: |
         export SKAFFOLD_INSECURE_REGISTRY=localhost:32000 SKAFFOLD_DEFAULT_REPO=localhost:32000
@@ -262,7 +262,7 @@
   - name: git checkout
     git:
       repo: https://github.com/jonmosco/kube-ps1.git
-      dest: .kube-ps1
+      dest: "{{ ansible_env.HOME }}/.kube-ps1"
   - name: update .bashrc
     lineinfile:
       path: .bashrc
@@ -276,14 +276,14 @@
   - name: git checkout
     git:
       repo: https://github.com/ahmetb/kubectx.git
-      dest: .kubectx
+      dest: "{{ ansible_env.HOME }}/.kubectx"
   - name: make kubectx script executable
     file:
-      path: .kubectx/kubectx
+      path: "{{ ansible_env.HOME }}/.kubectx/kubectx"
       mode: a+x
   - name: make kubens script executable
     file:
-      path: .kubectx/kubens
+      path: "{{ ansible_env.HOME }}/.kubectx/kubens"
       mode: a+x
   - name: create kctx symbolic link
     become: yes
@@ -322,7 +322,7 @@
   - name: git checkout ohmytmux
     git:
       repo: https://github.com/gpakosz/.tmux.git
-      dest: .tmux
+      dest: "{{ ansible_env.HOME }}/.tmux"
   - name: link configuration file in user home
     file:
       src: "{{ ansible_env.HOME }}/.tmux/.tmux.conf"
