@@ -28,7 +28,7 @@ The below are installed only on the `k8sdev` group:
 
 ## System requirements
 1. [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html?extIdCarryOver=true&sc_cid=701f2000001OH7YAAW) on your controller machine (e.g. laptop) which is typically different from, but could be the same as, the target machine you are preparing. You also need a couple of Ansible collections, install using the command:
-`ansible-galaxy collection install community.general community.kubernetes` (Make sure that you are using Ansible > v2.9)
+`ansible-galaxy collection install community.general kubernetes.core` (Make sure that you are using Ansible > v2.9)
 1. One or more SSH connections to the target machine(s) with public key authentication configured. You can do that by editing your `.ssh/config`. For example:
     ```bash
     # ~/.ssh/config
