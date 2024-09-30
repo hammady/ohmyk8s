@@ -182,10 +182,18 @@
 - name: k9s installer
   hosts: k8sdev, k8sdevlite
   tasks:
+  - name: Determine the correct package link based on architecture
+    set_fact:
+      package_link: >-
+        {%- if ansible_architecture == 'aarch64' -%}
+        https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_arm64.tar.gz        
+        {%- else  -%}
+        https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz
+        {%- endif -%}
   - name: download k9s
     become: yes
     unarchive:
-      src: https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz
+      src: "{{ package_link }}"
       remote_src: yes
       dest: /usr/local/bin/
       extra_opts:
@@ -272,7 +280,7 @@
       dest: "{{ ansible_env.HOME }}/.kube-ps1"
   - name: update .bashrc
     lineinfile:
-      path: .bashrc
+      path: "{{ ansible_env.HOME }}/.bashrc"
       regexp: 'source \$HOME/\.kube-ps1.*'
       line: |
         source $HOME/.kube-ps1/kube-ps1.sh && PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
