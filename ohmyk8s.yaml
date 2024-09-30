@@ -138,7 +138,7 @@
     become: yes
     shell: 'helm completion bash >/etc/bash_completion.d/helm'
   - name: install helm-secrets plugin
-    community.kubernetes.helm_plugin:
+    kubernetes.core.helm_plugin:
       plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
 
@@ -240,11 +240,11 @@
   hosts: k8sdev
   tasks:
   - name: add ingress-nginx repo
-    community.kubernetes.helm_repository:
+    kubernetes.core.helm_repository:
       name: ingress-nginx
       repo_url: "https://kubernetes.github.io/ingress-nginx"
   - name: deploy ingress-nginx chart 
-    community.kubernetes.helm:
+    kubernetes.core.helm:
       name: ingress-nginx
       chart_ref: ingress-nginx/ingress-nginx
       release_namespace: kube-system
