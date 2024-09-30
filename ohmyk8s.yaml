@@ -141,13 +141,20 @@
     community.kubernetes.helm_plugin:
       plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
-
 - name: skaffold installer
   hosts: k8sdev, k8sdevlite
   tasks:
+  - name: Determine the correct package link based on architecture
+    set_fact:
+      package_link: >-
+        {%- if ansible_architecture == 'aarch64' -%}
+        https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-arm64
+        {%- else  -%}
+        https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+        {%- endif -%}
   - name: download skaffold
     get_url: 
-      url: https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+      url: "{{ package_link }}"
       dest: /tmp/skaffold
   - name: copy to $PATH
     become: yes
