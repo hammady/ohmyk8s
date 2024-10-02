@@ -1,4 +1,14 @@
 ---
+- name: Detect target machine architecture
+  hosts: k8sdev, k8sdevlite
+  tasks:
+    - name: Set global architecture variable based on target machine's architecture
+      set_fact:
+        target_mc_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    - name: Display the architecture being set
+      debug:
+        msg: "Architecture for the target machine is set to: {{ target_mc_arch }}"
+
 - name: docker dependencies installer
   hosts: k8sdev, k8sdevlite
   become: true
@@ -112,17 +122,9 @@
 - name: sops installer
   hosts: k8sdev, k8sdevlite
   tasks:
-  - name: Determine the correct package link based on architecture
-    set_fact:
-      package_link: >-
-        {%- if ansible_architecture == 'aarch64' -%}
-        https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.arm64
-        {%- else  -%}
-        https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
-        {%- endif -%}
   - name: download sops
     get_url: 
-      url: "{{ package_link }}"
+      url: "https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.{{ target_mc_arch }}"
       dest: /tmp/sops
   - name: copy to $PATH
     become: yes
@@ -152,17 +154,9 @@
 - name: skaffold installer
   hosts: k8sdev, k8sdevlite
   tasks:
-  - name: Determine the correct package link based on architecture
-    set_fact:
-      package_link: >-
-        {%- if ansible_architecture == 'aarch64' -%}
-        https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-arm64
-        {%- else  -%}
-        https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
-        {%- endif -%}
   - name: download skaffold
     get_url: 
-      url: "{{ package_link }}"
+      url: "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-{{ target_mc_arch }}"
       dest: /tmp/skaffold
   - name: copy to $PATH
     become: yes
@@ -190,18 +184,10 @@
 - name: k9s installer
   hosts: k8sdev, k8sdevlite
   tasks:
-  - name: Determine the correct package link based on architecture
-    set_fact:
-      package_link: >-
-        {%- if ansible_architecture == 'aarch64' -%}
-        https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_arm64.tar.gz        
-        {%- else  -%}
-        https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_amd64.tar.gz
-        {%- endif -%}
   - name: download k9s
     become: yes
     unarchive:
-      src: "{{ package_link }}"
+      src: "https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_{{ target_mc_arch }}.tar.gz"
       remote_src: yes
       dest: /usr/local/bin/
       extra_opts:
