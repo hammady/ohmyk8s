@@ -112,15 +112,15 @@
 - name: sops installer
   hosts: k8sdev, k8sdevlite
   tasks:
-    - name: Determine the correct package link based on architecture
-      set_fact:
-        package_link: >-
-          {%- if ansible_architecture == 'aarch64' -%}
-          https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.arm64
-          {%- else  -%}
-          https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
-          {%- endif -%}
-    - name: download sops
+  - name: Determine the correct package link based on architecture
+    set_fact:
+      package_link: >-
+        {%- if ansible_architecture == 'aarch64' -%}
+        https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.arm64
+        {%- else  -%}
+        https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.amd64
+        {%- endif -%}
+  - name: download sops
     get_url: 
       url: "{{ package_link }}"
       dest: /tmp/sops
@@ -146,7 +146,7 @@
     become: yes
     shell: 'helm completion bash >/etc/bash_completion.d/helm'
   - name: install helm-secrets plugin
-    community.kubernetes.helm_plugin:
+    kubernetes.core.helm_plugin:
       plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
 - name: skaffold installer
