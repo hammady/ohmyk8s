@@ -60,9 +60,11 @@ machines at once, run the following:
 ```bash
 git clone https://github.com/hammady/ohmyk8s.git
 cd ohmyk8s
-ansible-playbook ohmyk8s.yaml -v
+ansible-playbook ohmyk8s.yaml -Kv
 ```
-Note: `ansible-playbook` accepts -v for verbose mode (-vvv for more, -vvvv to enable connection debugging)
+Note: 
+- `ansible-playbook` accepts -v for verbose mode (-vvv for more, -vvvv to enable connection debugging)
+- `-K` to collect `BECOME password`
 
 Sit (or stand!) and watch the results, you should get a report similar to the below if everything goes well:
 ```

@@ -1,4 +1,14 @@
 ---
+- name: Detect target machine architecture
+  hosts: k8sdev, k8sdevlite
+  tasks:
+    - name: Set global architecture variable based on target machine's architecture
+      set_fact:
+        target_mc_arch: "{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    - name: Display the architecture being set
+      debug:
+        msg: "Architecture for the target machine is set to: {{ target_mc_arch }}"
+
 - name: docker dependencies installer
   hosts: k8sdev, k8sdevlite
   become: true
@@ -114,7 +124,7 @@
   tasks:
   - name: download sops
     get_url: 
-      url: https://github.com/mozilla/sops/releases/download/v3.7.3/sops-v3.7.3.linux
+      url: "https://github.com/getsops/sops/releases/download/v3.7.3/sops-v3.7.3.linux.{{ target_mc_arch }}"
       dest: /tmp/sops
   - name: copy to $PATH
     become: yes
@@ -141,13 +151,12 @@
     kubernetes.core.helm_plugin:
       plugin_path: https://github.com/jkroepke/helm-secrets
       state: present
-
 - name: skaffold installer
   hosts: k8sdev, k8sdevlite
   tasks:
   - name: download skaffold
     get_url: 
-      url: https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-amd64
+      url: "https://storage.googleapis.com/skaffold/releases/latest/skaffold-linux-{{ target_mc_arch }}"
       dest: /tmp/skaffold
   - name: copy to $PATH
     become: yes
@@ -178,7 +187,7 @@
   - name: download k9s
     become: yes
     unarchive:
-      src: https://github.com/derailed/k9s/releases/download/v0.27.4/k9s_Linux_amd64.tar.gz
+      src: "https://github.com/derailed/k9s/releases/download/v0.32.5/k9s_Linux_{{ target_mc_arch }}.tar.gz"
       remote_src: yes
       dest: /usr/local/bin/
       extra_opts:
@@ -265,7 +274,7 @@
       dest: "{{ ansible_env.HOME }}/.kube-ps1"
   - name: update .bashrc
     lineinfile:
-      path: .bashrc
+      path: "{{ ansible_env.HOME }}/.bashrc"
       regexp: 'source \$HOME/\.kube-ps1.*'
       line: |
         source $HOME/.kube-ps1/kube-ps1.sh && PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
