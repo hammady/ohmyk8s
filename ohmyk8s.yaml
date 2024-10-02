@@ -124,7 +124,7 @@
   tasks:
   - name: download sops
     get_url: 
-      url: "https://github.com/getsops/sops/releases/download/v3.9.0/sops-v3.9.0.linux.{{ target_mc_arch }}"
+      url: "https://github.com/getsops/sops/releases/download/v3.7.3/sops-v3.7.3.linux.{{ target_mc_arch }}"
       dest: /tmp/sops
   - name: copy to $PATH
     become: yes
