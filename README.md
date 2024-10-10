@@ -1,11 +1,11 @@
 # Oh My Kubernetes!
-An Ansible Playbook to automate the configuration of (Ubuntu Linux x86_64) machines
-to be ready for Kubernetes development. It cuts down the development
+An Ansible Playbook to automate the configuration of (Ubuntu Linux x86_64 and ARM64)
+machines to be ready for Kubernetes development. It cuts down the development
 environment preparation from tedious hours to less than 5 minutes.
 
 ## Included software
 
-The below are installed on both `k8sdev` and `k8sdevlite` groups:
+The below are installed on all groups (`k8sdev`, `k8sdevlite` and `k8sdevdocker`):
 
 - [git](https://git-scm.com/)
 - [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
@@ -18,11 +18,14 @@ The below are installed on both `k8sdev` and `k8sdevlite` groups:
 - [kube-ps1](https://github.com/jonmosco/kube-ps1)
 - [tmux](https://tmuxcheatsheet.com/) and [.tmux](https://github.com/gpakosz/.tmux)
 - [kubectx/kubens](https://github.com/ahmetb/kubectx)
+- [docker-cli](https://docs.docker.com/engine/reference/commandline/cli/)
 
 All of the above come with bash completion, whenever applicable.
 
-The below are installed only on the `k8sdev` group:
+The below is installed on both `k8sdev` and `k8sdevdocker` groups:
 - [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+
+The below are installed only on the `k8sdev` group:
 - [Kubernetes (microk8s)](https://microk8s.io/)
 - [ingress-nginx](https://kubernetes.github.io/ingress-nginx/)
 
@@ -50,6 +53,8 @@ containing all the machines you want to configure (yes you can configure many ma
     ...
     [k8sdevlite]
     ...
+    [k8sdevdocker]
+    ...
     ```
 
 The above file can be stored in the default location `/etc/ansible/hosts` if the control machine is running Debian/Ubuntu or a similar distro. For other distros or other operating systems, you can store it in any location then supply `--inventory <file-location>` to the `ansible-playbook` command.
@@ -74,9 +79,8 @@ awsdev1                     : ok=56   changed=7    unreachable=0    failed=0    
 ```
 
 ## Caveats
-- This only supports Ubuntu 20.04 running on x86_64 architectures.
+- This only supports Ubuntu running on either x86_64 or ARM64 architectures.
 Support for other distributions and architectures is possible but needs some work.
-For example, the `focal` distro is hard-coded in some lines and should be detected.
 
 ## Support
 If there are any errors from the above command, please create an issue in this repo or drop
